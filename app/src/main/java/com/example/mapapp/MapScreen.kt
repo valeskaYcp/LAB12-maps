@@ -5,8 +5,6 @@ import android.graphics.BitmapFactory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.example.mapapp.R
@@ -17,7 +15,6 @@ import com.google.maps.android.compose.rememberMarkerState
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker
 
-
 @Composable
 fun MapScreen() {
     val ArequipaLocation = LatLng(-16.4040102, -71.559611) // Arequipa, Perú
@@ -27,6 +24,11 @@ fun MapScreen() {
     val context = LocalContext.current
     val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cordillera)
     val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
+    val locations = listOf(
+        LatLng(-16.433415, -71.5442652), // JLByR
+        LatLng(-16.4205151, -71.4945209), // Paucarpata
+        LatLng(-16.3524187, -71.5675994) // Zamacola
+    )
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Añadir GoogleMap al layout
@@ -40,6 +42,16 @@ fun MapScreen() {
                 icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap),
                 title = "Arequipa, Perú"
             )
+
+            // Añadir marcadores para las otras ubicaciones
+            locations.forEach { location ->
+                Marker(
+                    state = rememberMarkerState(position = location),
+                    icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap),
+                    title = "Ubicación",
+                    snippet = "Punto de interés"
+                )
+            }
         }
     }
 }
