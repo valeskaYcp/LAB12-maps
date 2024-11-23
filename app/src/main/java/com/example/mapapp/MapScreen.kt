@@ -2,20 +2,20 @@ package com.example.lab12_maps
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.example.mapapp.R
-import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
 import com.google.maps.android.compose.rememberMarkerState
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.Marker
+import androidx.compose.material3.*
 
 @Composable
 fun MapScreen() {
@@ -26,39 +26,46 @@ fun MapScreen() {
     val context = LocalContext.current
     val originalBitmap = BitmapFactory.decodeResource(context.resources, R.drawable.cordillera)
     val scaledBitmap = Bitmap.createScaledBitmap(originalBitmap, 100, 100, false)
-    val locations = listOf(
-        LatLng(-16.433415, -71.5442652), // JLByR
-        LatLng(-16.4205151, -71.4945209), // Paucarpata
-        LatLng(-16.3524187, -71.5675994) // Zamacola
-    )
 
-    LaunchedEffect(Unit) {
-        cameraPositionState.animate(
-            update = CameraUpdateFactory.newLatLngZoom(LatLng(-16.2520984,-71.6836503), 12f), // Mover a Yura
-            durationMs = 3000
-        )
-    }
+    // Variable para cambiar el tipo de mapa
+    var mapType by remember { mutableStateOf(com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        // Añadir GoogleMap al layout
-        GoogleMap(
-            modifier = Modifier.fillMaxSize(),
-            cameraPositionState = cameraPositionState
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Botones para cambiar el tipo de mapa
+        Row(
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
-            // Añadir marcador en Arequipa Perú
-            Marker(
-                state = rememberMarkerState(position = ArequipaLocation),
-                icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap),
-                title = "Arequipa, Perú"
-            )
+            Button(onClick = { mapType = com.google.android.gms.maps.GoogleMap.MAP_TYPE_NORMAL }) {
+                Text("Normal")
+            }
+            Button(onClick = { mapType = com.google.android.gms.maps.GoogleMap.MAP_TYPE_HYBRID }) {
+                Text("Híbrido")
+            }
+            Button(onClick = { mapType = com.google.android.gms.maps.GoogleMap.MAP_TYPE_SATELLITE }) {
+                Text("Satélite")
+            }
+            Button(onClick = { mapType = com.google.android.gms.maps.GoogleMap.MAP_TYPE_TERRAIN }) {
+                Text("Terreno")
+            }
+        }
 
-            // Añadir marcadores para las otras ubicaciones
-            locations.forEach { location ->
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Añadir GoogleMap al layout
+            GoogleMap(
+                modifier = Modifier.fillMaxSize(),
+                cameraPositionState = cameraPositionState,
+                uiSettings = MapUiSettings(
+                    mapToolbarEnabled = false // Desactivar herramientas de mapa
+                )
+            ) {
+                // Añadir marcador en Arequipa Perú
                 Marker(
-                    state = rememberMarkerState(position = location),
+                    state = rememberMarkerState(position = ArequipaLocation),
                     icon = BitmapDescriptorFactory.fromBitmap(scaledBitmap),
-                    title = "Ubicación",
-                    snippet = "Punto de interés"
+                    title = "Arequipa, Perú"
                 )
             }
         }
